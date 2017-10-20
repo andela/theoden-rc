@@ -11,7 +11,8 @@ dependencies:
     - "~/.meteor"
     - "~/docker"
   override:
-    - cd $HOME/reaction
+    - mkdir $HOME/THEODEN_RC
+    - cd $HOME/THEODEN_RC
     - .reaction/scripts/clone-packages.sh
     - .reaction/docker/scripts/plugin-loader.sh
 
@@ -47,3 +48,5 @@ deployment:
       - docker push $DOCKER_NAMESPACE/base:latest
       - docker push $DOCKER_NAMESPACE/reaction:$CIRCLE_BUILD_NUM
       - docker push $DOCKER_NAMESPACE/reaction:latest
+  webhooks:
+    - url: https://coveralls.io/webhook?repo_token=COVERALLS_REPO_TOKEN
