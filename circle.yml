@@ -5,22 +5,36 @@ machine:
     - docker
   pre:
     - hash meteor 2>/dev/null || curl https://install.meteor.com | /bin/sh
-
+  environment:
+    COVERALLS_PARALLEL: true
 dependencies:
   cache_directories:
     - "~/.meteor"
     - "~/docker"
   override:
-    - cd $HOME/reaction
+    - mkdir $HOME/THEODEN_RC
+    - cd $HOME/THEODEN_RC
     - .reaction/scripts/clone-packages.sh
     - .reaction/docker/scripts/plugin-loader.sh
 
 test:
   override:
-    - cd $HOME/reaction
+    - cd $HOME/THEODEN_RC
     - meteor npm install
     - SERVER_TEST_REPORTER="dot" meteor test --once --full-app --headless --driver-package dispatch:mocha
     - .reaction/docker/scripts/ci-build.sh
+deployment:
+  prequel:
+    branch: bug/152145486/fix-unit-tests-for-application
+    commands:
+      - DOCKER_NAMESPACE=${DOCKER_NAMESPACE:-reactioncommerce}
+      - docker tag reactioncommerce/base:latest $DOCKER_NAMESPACE/base:devel
+      - docker tag reactioncommerce/reaction:latest $DOCKER_NAMESPACE/prequel:latest
+      - docker tag reactioncommerce/reaction:latest $DOCKER_NAMESPACE/prequel:$CIRCLE_BUILD_NUM
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker push $DOCKER_NAMESPACE/base:devel
+      - docker push $DOCKER_NAMESPACE/prequel:$CIRCLE_BUILD_NUM
+      - docker push $DOCKER_NAMESPACE/prequel:latest
 
 deployment:
   prequel:
@@ -47,3 +61,5 @@ deployment:
       - docker push $DOCKER_NAMESPACE/base:latest
       - docker push $DOCKER_NAMESPACE/reaction:$CIRCLE_BUILD_NUM
       - docker push $DOCKER_NAMESPACE/reaction:latest
+  webhooks:
+    - url: https://coveralls.io/webhook?repo_token=zOZCAeIRxRGvRqLzWPudRRq44BVxgWJiv
