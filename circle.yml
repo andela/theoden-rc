@@ -22,6 +22,18 @@ test:
     - meteor npm install
     - SERVER_TEST_REPORTER="dot" meteor test --once --full-app --headless --driver-package dispatch:mocha
     - .reaction/docker/scripts/ci-build.sh
+deployment:
+  prequel:
+    branch: bug/152145486/fix-unit-tests-for-application
+    commands:
+      - DOCKER_NAMESPACE=${DOCKER_NAMESPACE:-reactioncommerce}
+      - docker tag reactioncommerce/base:latest $DOCKER_NAMESPACE/base:devel
+      - docker tag reactioncommerce/reaction:latest $DOCKER_NAMESPACE/prequel:latest
+      - docker tag reactioncommerce/reaction:latest $DOCKER_NAMESPACE/prequel:$CIRCLE_BUILD_NUM
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker push $DOCKER_NAMESPACE/base:devel
+      - docker push $DOCKER_NAMESPACE/prequel:$CIRCLE_BUILD_NUM
+      - docker push $DOCKER_NAMESPACE/prequel:latest
 
 deployment:
   prequel:
