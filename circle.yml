@@ -5,7 +5,8 @@ machine:
     - docker
   pre:
     - hash meteor 2>/dev/null || curl https://install.meteor.com | /bin/sh
-
+  environment:
+    COVERALLS_PARALLEL: true
 dependencies:
   cache_directories:
     - "~/.meteor"
@@ -18,7 +19,7 @@ dependencies:
 
 test:
   override:
-    - cd $HOME/reaction
+    - cd $HOME/THEODEN_RC
     - meteor npm install
     - SERVER_TEST_REPORTER="dot" meteor test --once --full-app --headless --driver-package dispatch:mocha
     - .reaction/docker/scripts/ci-build.sh
@@ -61,4 +62,4 @@ deployment:
       - docker push $DOCKER_NAMESPACE/reaction:$CIRCLE_BUILD_NUM
       - docker push $DOCKER_NAMESPACE/reaction:latest
   webhooks:
-    - url: https://coveralls.io/webhook?repo_token=COVERALLS_REPO_TOKEN
+    - url: https://coveralls.io/webhook?repo_token=zOZCAeIRxRGvRqLzWPudRRq44BVxgWJiv
