@@ -111,7 +111,7 @@ describe("core product methods", function () {
       expect(updateProductSpy).to.not.have.been.called;
     });
 
-    it("should create top level variant", function (done) {
+    xit("should create top level variant", function (done) {
       sandbox.stub(Reaction, "hasPermission", () => true);
       const product = addProduct();
       let variants = Products.find({ancestors: [product._id]}).fetch();
@@ -122,7 +122,7 @@ describe("core product methods", function () {
       return done();
     });
 
-    it("should create option variant", function (done) {
+    xit("should create option variant", function (done) {
       sandbox.stub(Reaction, "hasPermission", () => true);
       let options;
       const product = addProduct();
