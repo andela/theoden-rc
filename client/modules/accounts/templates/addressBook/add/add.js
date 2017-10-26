@@ -70,10 +70,19 @@ Template.addressBookAdd.events({
  */
 AutoForm.hooks({
   addressBookAddForm: {
+    beginSubmit: function () {
+      this.removeStickyValidationError("phone");
+    },
     onSubmit: function (insertDoc) {
       this.event.preventDefault();
       const addressBook = $(this.template.firstNode).closest(".address-book");
-
+      // extra validation test to ensure phone number
+      const phoneCheck = new RegExp("[^0-9+\(\)#\.\s\-]");
+      if (phoneCheck.test(insertDoc.phone)) {
+        this.addStickyValidationError("phone", "invalidPhone");
+        this.done();
+        return false;
+      }
       Meteor.call("accounts/addressBookAdd", insertDoc, (error, result) => {
         if (error) {
           Alerts.toast(i18next.t("addressBookAdd.failedToAddAddress", { err: error.message }), "error");
