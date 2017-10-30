@@ -8,8 +8,8 @@ Meteor.methods({
  */
   "paystack/getKeys"() {
     return {
-      public: process.env.PUBLIC_KEY,
-      secret: process.env.SECRET_KEY
+      public: process.env.PAYSTACK_PUBLIC_KEY,
+      secret: process.env.PAYSTACK_SECRET_KEY
     };
   }
 });
