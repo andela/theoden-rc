@@ -1,4 +1,4 @@
-import _ from  "lodash";
+import _ from "lodash";
 import { EJSON } from "meteor/ejson";
 import { check } from "meteor/check";
 import { Meteor } from "meteor/meteor";
@@ -68,7 +68,7 @@ function createTitle(newTitle, productId) {
       title = `${titleString}-${titleNumberSuffix + titleCount}`;
     } else {
       // first copy will be "...-copy", second: "...-copy-2"
-      title = `${titleString}-copy${ titleCount > 1 ? "-" + titleCount : ""}`;
+      title = `${titleString}-copy${titleCount > 1 ? "-" + titleCount : ""}`;
     }
   }
 
@@ -124,7 +124,7 @@ function createHandle(productHandle, productId) {
       handle = `${handleString}-${handleNumberSuffix + handleCount}`;
     } else {
       // first copy will be "...-copy", second: "...-copy-2"
-      handle = `${handleString}-copy${ handleCount > 1
+      handle = `${handleString}-copy${handleCount > 1
         ? '-' + handleCount : ''}`;
     }
   }
@@ -375,19 +375,19 @@ Meteor.methods({
           if (type === "child") {
             Logger.info(
               `products/cloneVariant: created sub child clone: ${
-                clone._id} from ${variantId}`
+              clone._id} from ${variantId}`
             );
           } else {
             Logger.info(
               `products/cloneVariant: created clone: ${
-                clone._id} from ${variantId}`
+              clone._id} from ${variantId}`
             );
           }
         }
         if (error) {
           Logger.error(
             `products/cloneVariant: cloning of ${variantId} was failed: ${
-              error}`
+            error}`
           );
         }
       });
@@ -441,7 +441,7 @@ Meteor.methods({
         if (result) {
           Logger.info(
             `products/createVariant: created variant: ${
-              newVariantId} for ${parentId}`
+            newVariantId} for ${parentId}`
           );
         }
       }
@@ -482,10 +482,10 @@ Meteor.methods({
       }, (error, result) => {
         if (result) {
           const productId = currentVariant.ancestors[0];
-          // we need manually check is these fields were updated?
-          // we can't stop after successful denormalization, because we have a
-          // case when several fields could be changed in top-level variant
-          // before form will be submitted.
+            // we need manually check is these fields were updated?
+            // we can't stop after successful denormalization, because we have a
+            // case when several fields could be changed in top-level variant
+            // before form will be submitted.
           toDenormalize.forEach(field => {
             if (currentVariant[field] !== variant[field]) {
               denormalize(productId, field);
@@ -592,7 +592,7 @@ Meteor.methods({
 
       const newProduct = Object.assign({}, product, {
         _id: productNewId
-          // ancestors: product.ancestors.push(product._id)
+        // ancestors: product.ancestors.push(product._id)
       });
       delete newProduct.updatedAt;
       delete newProduct.createdAt;
@@ -673,7 +673,7 @@ Meteor.methods({
     }, {
       validate: false
     }, (error, result) => {
-      // additionally, we want to create a variant to a new product
+        // additionally, we want to create a variant to a new product
       if (result) {
         Products.insert({
           ancestors: [result],
@@ -790,7 +790,6 @@ Meteor.methods({
       const stringValue = EJSON.stringify(value);
       update = EJSON.parse("{\"" + field + "\":" + stringValue + "}");
     }
-
     // we need to use sync mode here, to return correct error and result to UI
     const result = Products.update(_id, {
       $set: update
@@ -1074,8 +1073,8 @@ Meteor.methods({
       }, (error, result) => {
         if (result) {
           Logger.info(
-            `Variant ${id} position was updated to index ${index}`
-          );
+              `Variant ${id} position was updated to index ${index}`
+            );
         }
       });
     });
@@ -1269,5 +1268,37 @@ Meteor.methods({
 
     Logger.debug("invalid product visibility ", productId);
     throw new Meteor.Error(400, "Bad Request");
+  },
+  /**
+  * products/productGrids
+  * @summary Removes blank products
+  * @param {Object} [product] - optional product object
+  * @return {*} none
+  */
+  "products/removeBlankProducts": function () {
+    if (!Reaction.hasPermission("createProduct")) {
+      throw new Meteor.Error(403, "Access Denied");
+    }
+    const blankProducts = Products.find({
+      $and: [
+        { ancestors: { $size: 0 } },
+        {
+          $or: [
+            { title: "" },
+            { pageTitle: ""},
+            { description: "" },
+            { vendor: "" }
+          ]
+        }
+      ]
+    }, { fields: { _id: 1 } });
+
+    const blankProductsId = blankProducts.map(products => products._id);
+    Products.direct.remove({
+      $or: [
+        { _id: { $in: blankProductsId } },
+        { ancestors: { $elemMatch: { $in: blankProductsId } } }
+      ]
+    });
   }
 });

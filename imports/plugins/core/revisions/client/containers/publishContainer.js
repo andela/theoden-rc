@@ -22,14 +22,13 @@ class PublishContainer extends Component {
           const message = i18next.t("revisions.changedPublished", {
             defaultValue: "Changes published successfully"
           });
-
           Alerts.toast(message, "success");
         } else {
-          const message = i18next.t("revisions.noChangesPublished", {
-            defaultValue: "There are no changes to publish"
-          });
-
-          Alerts.toast(message, "warning");
+          if (error) {
+            Alerts.toast(error.reason, "error");
+          } else {
+            Alerts.toast(result, "error");
+          }
         }
       });
     }
@@ -51,11 +50,7 @@ class PublishContainer extends Component {
 
             Alerts.toast(message, "success");
           } else {
-            const message = i18next.t("revisions.noChangesDiscarded", {
-              defaultValue: "There are no changes to discard"
-            });
-
-            Alerts.toast(message, "warning");
+            Alerts.toast(error.message, "error");
           }
         });
         break;

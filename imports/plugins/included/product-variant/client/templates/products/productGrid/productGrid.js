@@ -15,6 +15,7 @@ Template.productGrid.onCreated(function () {
 });
 
 Template.productGrid.onRendered(function () {
+  Meteor.call("products/removeBlankProducts");
   const instance = this;
 
   if (Reaction.hasPermission("createProduct")) {

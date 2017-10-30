@@ -30,10 +30,10 @@ Template.childVariantForm.helpers({
     const media = Media.find({
       "metadata.variantId": this._id
     }, {
-      sort: {
-        "metadata.priority": 1
-      }
-    });
+        sort: {
+          "metadata.priority": 1
+        }
+      });
 
     return media;
   },
@@ -41,10 +41,10 @@ Template.childVariantForm.helpers({
     const media = Media.findOne({
       "metadata.variantId": this._id
     }, {
-      sort: {
-        "metadata.priority": 1
-      }
-    });
+        sort: {
+          "metadata.priority": 1
+        }
+      });
 
     if (media) {
       return [media];
@@ -107,7 +107,7 @@ Template.childVariantForm.events({
     Meteor.call("products/updateProductField", variant._id, field, value,
       error => {
         if (error) {
-          throw new Meteor.Error("error updating variant", error);
+          Alerts.toast(error.reason, "error");
         }
       });
     return ReactionProduct.setCurrentVariant(variant._id);
