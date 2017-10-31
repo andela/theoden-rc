@@ -95,5 +95,6 @@ practicalmeteor:sinon
 
 
 # Custom Packages
-simple:rest
 pauldowman:dotenv
+nimble:restivus
+apinf:restivus-swagger

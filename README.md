@@ -85,6 +85,11 @@ Installation, configuration and development documentation is available on [docs.
 
 The Reaction documentation source is located in the [reaction-docs](https://github.com/reactioncommerce/reaction-docs) repository, while the documentation site is the [reactioncommerce/redoc](https://github.com/reactioncommerce/redoc) application.
 
+### API DOCUMENTATION
+
+The documentation for the available RESTful endpoints in the Theoden Reaction Commerce API can be found [here](https://app.swaggerhub.com/apis/Oahray/Theoden-RC-API/1.0.0)
+
+
 ### Testing
 
 Testing is an important way of participating as well. If you do discover an issue, please create an [issue here](https://github.com/reactioncommerce/reaction/issues/new) to report an issue.
