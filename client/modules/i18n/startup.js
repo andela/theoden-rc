@@ -38,6 +38,10 @@ Meteor.startup(() => {
   // this only runs on initial page loaded
   // and when user.profile.lang updates
   Tracker.autorun(function () {
+    const addressSchema = Schemas.Address;
+    addressSchema.messages({
+      invalidPhone: "Phone Number is Invalid"
+    });
     if (Reaction.Subscriptions.Shops.ready() && Meteor.user()) {
       const shop = Shops.findOne(Reaction.getShopId());
       let language = shop.language;
