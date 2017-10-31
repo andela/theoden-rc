@@ -18,7 +18,6 @@ AutoForm.hooks({
       const phoneCheck = new RegExp("[^0-9+\(\)#\.\s\-]");
       if (phoneCheck.test(insertDoc.phone)) {
         this.addStickyValidationError("phone", "invalidPhone");
-        this.done();
         return false;
       }
       Meteor.call("accounts/addressBookUpdate", insertDoc, (error, result) => {
