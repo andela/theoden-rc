@@ -1,6 +1,6 @@
 <template name="indexCarousel">
     <div class="container-fluid carousel-container">
-        <div id="myCarousel" class="carousel slide" data-ride="carousel">
+        <div id="myCarousel" class="carousel slide" data-ride="carousel" style="height:340px;">
             <!-- Carousel indicators -->
             <ol class="carousel-indicators">
                 <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
@@ -10,13 +10,13 @@
             <!-- Wrapper for carousel items -->
             <div class="carousel-inner" role="listbox">
                 <div class="item active">
-                    <img src="/resources/carousel-images/hm_sale.png" alt="First Slide">
+                    <img src="/resources/carousel-images/carousel_image1.png" alt="First Slide">
                 </div>
                 <div class="item">
-                    <img src="/resources/carousel-images/phoneshop_sale.jpg" alt="Second Slide">
+                    <img src="/resources/carousel-images/carousel_image2.png" alt="Second Slide">
                 </div>
                 <div class="item">
-                    <img src="/resources/carousel-images/uniqlo_sale.png"  alt="Third Slide">
+                    <img src="/resources/carousel-images/carousel_image3.png"  alt="Third Slide">
                 </div>
             </div>
             <!-- Carousel controls -->
@@ -32,7 +32,7 @@
         </div>
     </div>
     <script type="text/javascript">
-      var $ = jQuery.noConflict(); $(document).ready(function()  { $('#myCarousel').carousel({ interval: 3000, cycle: true }); });
+      var $ = jQuery.noConflict(); $(document).ready(function()  { $('#myCarousel').carousel({ interval: 4000, cycle: true }); });
     </script>
 </template>
 
