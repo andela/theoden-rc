@@ -9,6 +9,7 @@ let pageList = [];
 let currentPage = 1;
 const numberPerPage = 10;
 let numberOfPages = 0;
+paystackKeys = {};
 
 Template.wallet.onCreated(function bodyOnCreated() {
   this.state = new ReactiveDict();
@@ -107,12 +108,6 @@ function confirmTransfer(transaction, recipient) {
     );
 }
 
-const getPaystackKeys = () => ({
-  public: "pk_test_e543d0abdb822b1d7895930a81b8cba4e214c531",
-  secret: "sk_test_45cb0e54113b2ccd14d418d962bf776199d1dc65"
-});
-
-
 const finalizeDeposit = paystackMethod => {
   Meteor.call(
     "wallet/transaction",
@@ -132,9 +127,8 @@ const finalizeDeposit = paystackMethod => {
 function handleDepositPayment(result) {
   const type = "deposit";
   const transactionRef = result.reference;
-  const paystackConfig = getPaystackKeys();
   if (transactionRef) {
-    verifyPaystackPayment(transactionRef, paystackConfig.secret, (error, response) => {
+    verifyPaystackPayment(transactionRef, paystackKeys.secret, (error, response) => {
       if (error) {
         Alerts.toast("Unable to verify payment", "error");
       } else if (response.data.status !== "success") {
@@ -211,14 +205,22 @@ Template.wallet.events({
       return false;
     }
 
-    const paystackConfig = getPaystackKeys();
-    const handler = PaystackPop.setup({
-      key: paystackConfig.public,
-      email: userMail,
-      amount: amount * 100,
-      callback: handleDepositPayment
+    Meteor.call("paystack/getKeys", (err, keys) => {
+      if (err) {
+        Alerts.toast("The was an error processing your request ", "error");
+        return false;
+      }
+
+      paystackKeys = keys;
+
+      const handler = PaystackPop.setup({
+        key: keys.public,
+        email: userMail,
+        amount: amount * 100,
+        callback: handleDepositPayment
+      });
+      return handler.openIframe();
     });
-    return handler.openIframe();
   },
 
   "submit #transfer": event => {
