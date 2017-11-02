@@ -101,6 +101,20 @@ Meteor.methods({
 
     if (revisions) {
       for (const revision of revisions) {
+        // check if product has a variant with a price if not return error
+        if (revision.documentData.ancestors.length < 1) {
+          const pricedVariant = Revisions.find({
+            $and: [
+              { "documentData.ancestors": { $in: [revision.documentId] } },
+              { "documentData.price": { $gt: 0 } }
+            ]
+          }, { fields: { _id: 1 } }).fetch();
+          if (pricedVariant.length < 1) {
+            errorMessage = "Please set the price of product";
+            return errorMessage;
+          }
+        }
+
         const res = Products.update({
           _id: revision.documentId
         }, {
