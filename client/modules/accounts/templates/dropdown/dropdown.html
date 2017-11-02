@@ -45,6 +45,7 @@
         </a>
       </li>
     {{/each}}
+    {{> walletMenu}}
   </ul>
 </template>
 
@@ -65,4 +66,15 @@
     <span class="icon-text" data-i18n="accountsUI.signedIn">You are signed in.</span>
   </li>
   {{/each}}
+</template>
+
+<template name="walletMenu">
+  <li id="wallet" class="dropdown-apps-icon" data-event-action="wallet-click">
+    <a href={{pathFor 'wallet'}} title="My Wallet">
+      <i class="fa fa-google-wallet"></i>
+      <span class="icon-text">
+        My Wallet
+      </span>
+    </a>
+  </li>
 </template>

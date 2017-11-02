@@ -20,3 +20,7 @@ import "./templates/layout/layout.html";
 
 import "./templates/theme/theme.html";
 import "./templates/theme/theme.js";
+
+// Wallet templates
+import "./templates/layout/wallet/wallet.html";
+import "./templates/layout/wallet/wallet.js";
