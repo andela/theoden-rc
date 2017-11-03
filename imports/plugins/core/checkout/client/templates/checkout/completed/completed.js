@@ -40,6 +40,15 @@ Template.cartCompleted.helpers({
       });
     }
     return {};
+  },
+  digitalOrder: function () {
+    let hasDigital = false;
+    this.items.forEach((item) => {
+      if (item.isDigital === true) {
+        hasDigital = true;
+      }
+    }, this);
+    return hasDigital;
   }
 });
 

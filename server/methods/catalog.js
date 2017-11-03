@@ -1027,14 +1027,14 @@ Meteor.methods({
       return Products.update({
         _id: productId
       }, {
-        $set: {
-          [position]: positionData.position,
-          [pinned]: positionData.pinned,
-          [weight]: positionData.weight,
-          [updatedAt]: new Date(),
-          type: "simple" // for multi-schema
-        }
-      });
+          $set: {
+            [position]: positionData.position,
+            [pinned]: positionData.pinned,
+            [weight]: positionData.weight,
+            [updatedAt]: new Date(),
+            type: "simple" // for multi-schema
+          }
+        });
     }
 
     if (product && product.positions && product.positions[tag]) {
@@ -1073,8 +1073,8 @@ Meteor.methods({
       }, (error, result) => {
         if (result) {
           Logger.info(
-              `Variant ${id} position was updated to index ${index}`
-            );
+            `Variant ${id} position was updated to index ${index}`
+          );
         }
       });
     });
@@ -1277,7 +1277,7 @@ Meteor.methods({
   */
   "products/removeBlankProducts": function () {
     if (!Reaction.hasPermission("createProduct")) {
-      throw new Meteor.Error(403, "Access Denied");
+      return false;
     }
     const blankProducts = Products.find({
       $and: [
@@ -1285,7 +1285,7 @@ Meteor.methods({
         {
           $or: [
             { title: "" },
-            { pageTitle: ""},
+            { pageTitle: "" },
             { description: "" },
             { vendor: "" }
           ]
