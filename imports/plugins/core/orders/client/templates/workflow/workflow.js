@@ -62,7 +62,14 @@ Template.coreOrderWorkflow.helpers({
     }
     return false;
   },
-
+  isCanceled() {
+    const order = Template.parentData(1);
+    if (order.workflow.status === "canceled" ||
+      order.workflow.status === "coreOrderWorkflow/canceled") {
+      return true;
+    }
+    return false;
+  },
   /**
    * isPending
    * @todo may need to be refactored

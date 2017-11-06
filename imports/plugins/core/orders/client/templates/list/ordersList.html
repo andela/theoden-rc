@@ -1,6 +1,6 @@
 <template name="dashboardOrdersList">
 
-{{#each orders data=data}}
+  {{#each orders data=data}}
   <div class="panel panel-default order-list-detail">
     <div class="panel-heading">
       <h3 class="panel-title">
@@ -20,10 +20,13 @@
         </div>
         <div class="col-xs-6 col-sm-10">
           {{#if orderStatus}}
-              <span data-i18n="order.completed">Completed</span>
+          <span data-i18n="order.completed">Completed</span>
+          {{else}} {{#if orderCancelled}}
+
+          <span data-i18n="order.canceled">Cancelled</span>
           {{else}}
-              <span data-i18n="order.processing">Processing</span>
-          {{/if}}
+          <span data-i18n="order.processing">Processing</span>
+          {{/if}} {{/if}}
         </div>
       </div>
 
@@ -34,18 +37,13 @@
           </strong>
         </div>
         <div class="col-xs-10">
-          {{#each shipping}}
-            {{#with address}}
-              <span>
-                <address>
-                  {{address1}}
-                  {{address2}}
-                  {{city}}, {{region}} {{postal}} {{country}}
-                  {{phone}}
-                </address>
-              </span>
-            {{/with}}
-          {{/each}}
+          {{#each shipping}} {{#with address}}
+          <span>
+            <address>
+              {{address1}} {{address2}} {{city}}, {{region}} {{postal}} {{country}} {{phone}}
+            </address>
+          </span>
+          {{/with}} {{/each}}
         </div>
       </div>
 
@@ -73,8 +71,7 @@
           <span id="order-payment-method">{{paymentMethod.storedCard}}</span>
           <span data-id="order.reference">Ref:</span>
           <span id="order-payment-transaction">{{paymentMethod.transactionId}}</span>
-          &nbsp;
-          {{/each}}
+          &nbsp; {{/each}}
         </div>
       </div>
 
@@ -93,7 +90,11 @@
           {{> ordersListItems order=.}}
         </div>
       </div>
-
+      {{#if cancelOrderButton}}
+      <button name="cancelOrder" class="btn btn-sm btn-danger" data-i18n="app.cancel">Cancel</button>
+      {{/if}} {{#if orderCanceledStatus}}
+      <span>Order Cancelled</span>
+      {{/if}}
     </div>
 
     <div class="panel-footer">
@@ -101,9 +102,9 @@
     </div>
   </div>
 
-{{else}}
+  {{else}}
   <div class="alert alert-info">
     <span data-i18n="cartCompleted.noOrdersFound">No orders found.</span>
   </div>
-{{/each}}
+  {{/each}}
 </template>

@@ -15,6 +15,80 @@ import { Logger, Reaction } from "/server/api";
  */
 Meteor.methods({
   /**
+  * orders/cancelOrder
+  * @summary Cancels the order and triggers workflow update
+  * @param {object} order - order Object
+  * @param {String} reason - Reason for cancelation
+  * @returns {String} workflow update
+  */
+  "orders/cancelOrder": function (order, reason) {
+    check(order, Object);
+    check(reason, String);
+
+    // confirmation check that order has not been completed
+    const orderDetail = Orders.findOne(order._id);
+
+    if (orderDetail.workflow.status === "coreOrderCompleted") {
+      throw new Meteor.Error(400, "Order Already Completed");
+    }
+    const newReason = {
+      reasonValue: reason,
+      userId: order.userId,
+      updatedAt: new Date
+    };
+
+    return Orders.update(order._id, {
+      $set: {
+        "workflow.status": "canceled",
+        "refunded": false
+      },
+      $push: {
+        reasons: newReason
+      },
+      $addToSet: {
+        "workflow.workflow": "coreOrderWorkflow/canceled"
+      }
+    });
+  },
+  "order/approveCancel": function (order, shipmentStatus) {
+    check(order, Object);
+    check(shipmentStatus, Boolean);
+
+    if (!Reaction.hasPermission("orders")) {
+      throw new Meteor.Error(403, "Access Denied");
+    }
+    const orderDetail = Orders.findOne(order._id);
+    const orderTotal = orderDetail.billing[0].invoice.total;
+    const shippingCost = orderDetail.billing[0].invoice.shipping;
+
+    const refundAmount = shipmentStatus ?
+      (orderTotal - shippingCost)
+      : orderTotal;
+
+    const transactionDetail = {
+      amount: refundAmount,
+      transactionType: "Credit",
+      from: "Order Refund",
+      date: new Date
+    };
+
+    return Meteor.call("wallet/transaction", orderDetail.userId, transactionDetail, (error) => {
+      if (error) {
+        throw new Meteor.Error(501, "Unable to Process Refund Try again!");
+      } else {
+        return Orders.update(order._id,
+          {
+            $set: {
+              refunded: true
+            },
+            $addToSet: {
+              "workflow.workflow": "coreOrderWorkflow/refunded"
+            }
+          });
+      }
+    });
+  },
+  /**
    * orders/shipmentTracking
    * @summary wraps addTracking and triggers workflow update
    * @param {Object} order - order Object
@@ -80,10 +154,10 @@ Meteor.methods({
         "_id": order._id,
         "shipping._id": shipment._id
       }, {
-        $set: {
-          "shipping.$.packed": packed
-        }
-      });
+          $set: {
+            "shipping.$.packed": packed
+          }
+        });
 
       // Set the status of the items as shipped
       const itemIds = shipment.items.map((item) => {
@@ -96,10 +170,10 @@ Meteor.methods({
           "_id": order._id,
           "shipping._id": shipment._id
         }, {
-          $set: {
-            "shipping.$.packed": packed
-          }
-        });
+            $set: {
+              "shipping.$.packed": packed
+            }
+          });
       }
       return result;
     }
@@ -436,7 +510,7 @@ Meteor.methods({
       from: `${shop.name} <${shop.emails[0].address}>`,
       subject: `Your order is confirmed`,
       // subject: `Order update from ${shop.name}`,
-      html: SSR.render(tpl,  dataForOrderEmail)
+      html: SSR.render(tpl, dataForOrderEmail)
     });
 
     return true;
@@ -490,10 +564,10 @@ Meteor.methods({
       "_id": orderId,
       "shipping._id": shippingId
     }, {
-      $addToSet: {
-        "shipping.shipments": data
-      }
-    });
+        $addToSet: {
+          "shipping.shipments": data
+        }
+      });
   },
 
   /**
@@ -518,10 +592,10 @@ Meteor.methods({
       "_id": order._id,
       "shipping._id": shipment._id
     }, {
-      $set: {
-        ["shipping.$.tracking"]: tracking
-      }
-    });
+        $set: {
+          ["shipping.$.tracking"]: tracking
+        }
+      });
   },
 
   /**
@@ -546,10 +620,10 @@ Meteor.methods({
       "_id": orderId,
       "shipping._id": shipmentId
     }, {
-      $push: {
-        "shipping.$.items": item
-      }
-    });
+        $push: {
+          "shipping.$.items": item
+        }
+      });
   },
 
   "orders/updateShipmentItem": function (orderId, shipmentId, item) {
@@ -565,10 +639,10 @@ Meteor.methods({
       "_id": orderId,
       "shipments._id": shipmentId
     }, {
-      $addToSet: {
-        "shipment.$.items": shipmentIndex
-      }
-    });
+        $addToSet: {
+          "shipment.$.items": shipmentIndex
+        }
+      });
   },
 
   /**
@@ -619,7 +693,7 @@ Meteor.methods({
       throw new Meteor.Error(403, "Access Denied. You are not connected.");
     }
 
-    return Orders.update({cartId: cartId}, {
+    return Orders.update({ cartId: cartId }, {
       $set: {
         email: email
       }
@@ -699,10 +773,10 @@ Meteor.methods({
       Products.update({
         _id: item.variants._id
       }, {
-        $inc: {
-          inventoryQuantity: -item.quantity
-        }
-      }, { selector: { type: "variant" } });
+          $inc: {
+            inventoryQuantity: -item.quantity
+          }
+        }, { selector: { type: "variant" } });
     });
   },
 
@@ -746,15 +820,15 @@ Meteor.methods({
               "_id": orderId,
               "billing.paymentMethod.transactionId": transactionId
             }, {
-              $set: {
-                "billing.$.paymentMethod.mode": "capture",
-                "billing.$.paymentMethod.status": "completed",
-                "billing.$.paymentMethod.metadata": metadata
-              },
-              $push: {
-                "billing.$.paymentMethod.transactions": result
-              }
-            });
+                $set: {
+                  "billing.$.paymentMethod.mode": "capture",
+                  "billing.$.paymentMethod.status": "completed",
+                  "billing.$.paymentMethod.metadata": metadata
+                },
+                $push: {
+                  "billing.$.paymentMethod.transactions": result
+                }
+              });
           } else {
             if (result && result.error) {
               Logger.fatal("Failed to capture transaction.", order, paymentMethod.transactionId, result.error);
@@ -766,16 +840,16 @@ Meteor.methods({
               "_id": orderId,
               "billing.paymentMethod.transactionId": transactionId
             }, {
-              $set: {
-                "billing.$.paymentMethod.mode": "capture",
-                "billing.$.paymentMethod.status": "error"
-              },
-              $push: {
-                "billing.$.paymentMethod.transactions": result
-              }
-            });
+                $set: {
+                  "billing.$.paymentMethod.mode": "capture",
+                  "billing.$.paymentMethod.status": "error"
+                },
+                $push: {
+                  "billing.$.paymentMethod.transactions": result
+                }
+              });
 
-            return {error: "orders/capturePayments: Failed to capture transaction"};
+            return { error: "orders/capturePayments: Failed to capture transaction" };
           }
         });
       }
@@ -839,10 +913,10 @@ Meteor.methods({
       "_id": orderId,
       "billing.paymentMethod.transactionId": transactionId
     }, {
-      $push: {
-        "billing.$.paymentMethod.transactions": result
-      }
-    });
+        $push: {
+          "billing.$.paymentMethod.transactions": result
+        }
+      });
 
     if (result.saved === false) {
       Logger.fatal("Attempt for refund transaction failed", order._id, paymentMethod.transactionId, result.error);

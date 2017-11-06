@@ -17,6 +17,8 @@ import "./templates/orderPage/orderPage.js";
 
 import "./templates/social/orderSocial.html";
 
+import "./templates/workflow/orderCanceled.html";
+import "./templates/workflow/orderCanceled.js";
 import "./templates/workflow/orderCompleted.html";
 import "./templates/workflow/orderSummary.html";
 import "./templates/workflow/shippingInvoice.html";
