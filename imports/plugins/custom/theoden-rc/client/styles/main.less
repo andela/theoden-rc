@@ -18,6 +18,7 @@
   color: grey;
 }
 
+
 .carousel-control{
 background-image: linear-gradient(to right, rgba(0, 0, 0, 0.0001) 0%, #fafafa 100%) !important;
   width: 7% !important;
@@ -75,4 +76,74 @@ background-image: linear-gradient(to right, rgba(0, 0, 0, 0.0001) 0%, #fafafa 10
 
 .footer-default{
   position: fixed;
+}
+
+/**
+ * Wallet
+ */
+
+.bg-info{
+  background-color: #D9ACD3;
+  font-family: @font-family-patua-one;
+}
+
+.table{
+  font-family: @font-family-josefin-sans;
+}
+
+body{
+  font-family: @font-family-patua-one;
+}
+
+#transaction-history{
+  font-family: @font-family-patua-one;
+  color: #000000;
+}
+
+
+
+
+
+/**
+ * Button
+ *  */
+.btn{
+  font-family: @font-family-patua-one;
+  &:hover{
+    background-color: #D9ACD3;
+  }
+  }
+
+  .btn-success{
+    background-color: @background-purple;
+  }
+
+#btn-checkout{
+  width: 60%;
+  margin: auto;
+  &:hover{
+    background-color: #D9ACD3;
+  }
+}
+
+
+.checkout-steps .panel-default >
+.panel-heading, .checkout-steps .panel-default .panel-heading {
+  background-color: @background-purple;
+  font-family: @font-family-patua-one;
+  color: white;
+
+}
+
+.panel-body{
+  font-family: @font-family-josefin-sans
+}
+
+.panel-default > .panel-heading{
+  background-color: @background-purple;
+  font-family: @font-family-patua-one;
+  color: white;
+}
+.panel-footer{
+  background-color: #e8e3e3;
 }
