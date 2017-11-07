@@ -10,11 +10,13 @@
 
       {{> searchTypeToggle }}
 
-      {{> productSearchTags tagSearchResults=tagSearchResults }}
+      {{> productSearchTags isProductSearch=isProductSearch allProducts=allProducts productSearchResults=productSearchResults tagSearchResults=tagSearchResults }}
 
     </div>
-
-    {{> searchResults productSearchResults=productSearchResults orderSearchResults=orderSearchResults accountSearchResults=accountSearchResults orderTable=orderTable accountTable=accountTable }}
+    <div class="search-results">
+      {{> searchResults searchQuery=searchQuery productSearchResults=productSearchResults orderSearchResults=orderSearchResults accountSearchResults=accountSearchResults orderTable=orderTable accountTable=accountTable }}
+    </div>
+    
 
   </div>
 
