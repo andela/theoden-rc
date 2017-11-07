@@ -52,6 +52,7 @@
     "moment": "^2.15.1",
     "moment-timezone": "^0.5.5",
     "money": "^0.2.0",
+    "nexmo": "^2.0.2",
     "node-geocoder": "^3.15.0",
     "nodemailer": "^2.6.4",
     "nodemailer-wellknown": "^0.2.0",
