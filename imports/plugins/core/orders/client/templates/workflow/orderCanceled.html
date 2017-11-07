@@ -1,0 +1,80 @@
+<template name="coreOrderCanceledDisplay">
+  <div aria-labelledby="orderCanceled" class="panel panel-default" id="orderCanceled-panel" role="tabpanel">
+
+    <div class="panel-heading">
+      <h5 class="panel-title">
+        Canceled {{orderAge}}
+        <span data-i18n="order.on">on</span>
+        <span>{{dateFormat checkCanceledReason.updatedAt format="D MMM h:mm"}}</span>
+      </h5>
+    </div>
+    <div class="panel-body">
+      <div>
+        Reason:
+        <span>
+          <strong>
+            {{checkCanceledReason.reasonValue}}</strong>
+        </span>
+      </div>
+      <br>
+      <div>
+        <span data-i18n="mail.headers.status">Status</span>:
+        <strong>{{#if orderRefunded}}Not Yet {{/if}}Refunded</strong>
+      </div>
+    </div>
+  </div>
+  <hr>
+  <div aria-labelledby="orderCanceledApprove" class="panel panel-default" id="orderCanceledApprove-panel" role="tabpanel">
+    <div class="panel-heading">
+      <h5 class="panel-title">
+        Cancelation Approval
+      </h5>
+    </div>
+    <div class="panel-body">
+      <br>
+
+      <div class="panel-heading">
+
+        <span data-i18n="order.refundAmount">
+          Refund Amount
+        </span>:
+      </div>
+
+      <div>
+        <div class="panel-body">
+          <div class="form-group order-summary-form-group row">
+            <div class="col-xs-7 text-right">Order total: </div>
+            <div class="col-xs-4 col-xs-offset-1">
+              <span> {{shippmentRefundDetails.currencyFormat.symbol}}</span>
+              <span>{{shippmentRefundDetails.orderTotal}}</span>
+            </div>
+          </div>
+          {{#if shipmentStatus.shipped}}
+          <div class="form-group order-summary-form-group row">
+            <div class="col-xs-7 text-right">less Shipping Cost:</div>
+            <div class="col-xs-4 col-xs-offset-1">
+              <span> {{shippmentRefundDetails.currencyFormat.symbol}} </span>
+              <span>{{shippmentRefundDetails.shippingCost}}</span>
+            </div>
+          </div>
+          {{/if}}
+          <div class="form-group order-summary-form-group row">
+            <div class="col-xs-7 text-right">Total Refund Amount: </div>
+            <div class="col-xs-4 col-xs-offset-1">
+              <span> {{shippmentRefundDetails.currencyFormat.symbol}}</span>
+              <span>
+                <strong>{{shippmentRefundDetails.totalRefundAmount}}</strong>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{#if orderRefunded}}
+      <div>
+        <button class="btn btn-info btn-block" type="button" name="approveCancel" data-event-action="approveCancel">Approve Cancelation and Refund
+        </button>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</template>
