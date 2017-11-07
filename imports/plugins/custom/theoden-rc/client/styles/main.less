@@ -110,7 +110,7 @@ body{
 .btn{
   font-family: @font-family-patua-one;
   &:hover{
-    background-color: #D9ACD3;
+    background-color: @background-light-purple;
   }
   }
 
@@ -118,11 +118,16 @@ body{
     background-color: @background-purple;
   }
 
-#btn-checkout{
+.btn[disabled]{
+  &:hover{
+    background-color: @background-light-purple;
+  }
+  }
+#btn-checkout, .btn-warning{
   width: 60%;
   margin: auto;
   &:hover{
-    background-color: #D9ACD3;
+    background-color: @background-light-purple;
   }
 }
 
@@ -146,4 +151,27 @@ body{
 }
 .panel-footer{
   background-color: #e8e3e3;
+}
+
+.pdp.add-to-cart button{
+  background-color: @background-purple;
+  &:hover{
+    background-color: @background-light-purple;
+  }
+}
+
+.pdp.add-to-cart input{
+  background-color: @background-purple;
+
+}
+
+.pdp.header h1, .pdp.header .title-edit-input{
+  font-size: 45px;
+  text-align:left;
+}
+
+.pdp.header h2, .pdp.header .pageTitle-edit-input{
+  color:black;
+  font-size: 28px;
+  text-align:left;
 }

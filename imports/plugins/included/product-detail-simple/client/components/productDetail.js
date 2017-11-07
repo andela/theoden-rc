@@ -82,7 +82,18 @@ class ProductDetail extends Component {
         <div className="container-main container-fluid pdp-container" itemScope itemType="http://schema.org/Product">
           <AlertContainer placement="productManagement" />
 
-          <header className="pdp header">
+
+
+          <div className="pdp-content">
+            <div className="pdp column left pdp-left-column">
+              {this.props.mediaGalleryComponent}
+              <ProductTags editable={this.props.editable} product={this.product} tags={this.tags} />
+              <ProductMetadata editable={this.props.editable} product={this.product} />
+            </div>
+
+            <div className="pdp column right pdp-right-column">
+
+            <header className="pdp header">
             <ProductField
               editable={this.editable}
               fieldName="title"
@@ -109,17 +120,6 @@ class ProductDetail extends Component {
               }}
             />
           </header>
-
-
-          <div className="pdp-content">
-            <div className="pdp column left pdp-left-column">
-              {this.props.mediaGalleryComponent}
-              <ProductTags editable={this.props.editable} product={this.product} tags={this.tags} />
-              <ProductMetadata editable={this.props.editable} product={this.product} />
-            </div>
-
-            <div className="pdp column right pdp-right-column">
-
 
               <div className="pricing">
                 <div className="left">
@@ -178,6 +178,7 @@ class ProductDetail extends Component {
               </div>
             </div>
           </div>
+
         </div>
       </div>
     );
