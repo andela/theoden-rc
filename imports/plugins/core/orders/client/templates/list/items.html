@@ -1,21 +1,24 @@
 <template name="ordersListItems">
-{{#each items}}
+  {{#each items}}
   <div class="order-items">
-      <div class="order-item">
-        <div class="order-item-media">
-          {{#with media}}
-            <img src="{{url store='thumbnail'}}">
-          {{else}}
-            <img src= "/resources/placeholder.gif">
-          {{/with}}
-        </div>
+    <div class="order-item">
+      <div class="order-item-media">
+        {{#with media}}
+        <img src="{{url store='thumbnail'}}"> {{else}}
+        <img src="/resources/placeholder.gif"> {{/with}}
+      </div>
 
       <div class="order-item-details">
 
         <div class="order-detail-title">
-          {{title}} <small>{{variants.title}}</small>
+          {{title}}
+          <small>{{variants.title}}</small>
+          {{#if isDigital}}
+          <a href="{{downloadLink}}">
+            <button> Download </button>
+          </a>
+          {{/if}}
         </div>
-
         <div class="order-detail-quantity">
         </div>
 
@@ -27,5 +30,5 @@
       </div>
     </div>
   </div>
-{{/each}}
+  {{/each}}
 </template>
