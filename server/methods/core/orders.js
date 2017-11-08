@@ -1,6 +1,8 @@
 import _ from "lodash";
 import path from "path";
 import moment from "moment";
+import Nexmo from 'nexmo';
+import dotenv from 'dotenv';
 import accounting from "accounting-js";
 import Future from "fibers/future";
 import { Meteor } from "meteor/meteor";
@@ -9,6 +11,13 @@ import { getSlug } from "/lib/api";
 import { Cart, Media, Orders, Products, Shops } from "/lib/collections";
 import * as Schemas from "/lib/collections/schemas";
 import { Logger, Reaction } from "/server/api";
+dotenv.config();
+
+// create a nexmo instance with api keys
+const nexmo = new Nexmo({
+  apiKey: process.env.NEXMO_API_KEY,
+  apiSecret: process.env.NEXMO_API_SECRET
+});
 
 /**
  * Reaction Order Methods
@@ -76,6 +85,8 @@ Meteor.methods({
       if (error) {
         throw new Meteor.Error(501, "Unable to Process Refund Try again!");
       } else {
+        orderDetail.refunded = true;
+        Meteor.call("orders/sendNotification", orderDetail);
         return Orders.update(order._id,
           {
             $set: {
@@ -166,6 +177,32 @@ Meteor.methods({
 
       const result = Meteor.call("workflow/pushItemWorkflow", "coreOrderItemWorkflow/packed", order, itemIds);
       if (result === 1) {
+        if (packed) {
+          const packedEmail = {
+            to: order.email,
+            from: "THEODEN-RC",
+            subject: "Packed Order",
+            html: `<div style="margin: 0 auto; padding: 0 auto;">
+            <h1 style="font-family: 'PT Serif', serif;color:#000">THEODEN-RC</h1>
+            <hr style="background-color:#2979FF; height:3px;"/>
+            <h2 style="color:#2979FF;
+            font-family: 'Playfair Display', serif;">Order Status</h2>
+            <p>Hi ${order.billing[0].address.fullName},</p>
+            <p>Thanks for purchasing from Theoden-Rc. We provide for your every need</p>
+            <p>Your order (${order.items[0].productId}) has been packed. You will receive delivery Shortly.</p>
+            <p><b>Product Id:</b> <b><i>${ (order.items[0].productId)}</i></b></p>
+            <p>The Theoden team</p>
+            <p>235 Ikorodu Road, Ilupeju Lagos</p>
+            </div>`
+          };
+          Reaction.Email.send(packedEmail);
+
+          const sender = "THEODEN-RC";
+          const recipient = `234${order.billing[0].address.phone.slice(1)}`;
+          const message = `Hi ${order.billing[0].address.fullName}. Your order (${order.items[0].productId}) has been packed. You will receive delivery Shortly`;
+
+          nexmo.message.sendSms(sender, recipient, message);
+        }
         return Orders.update({
           "_id": order._id,
           "shipping._id": shipment._id
@@ -500,6 +537,31 @@ Meteor.methods({
       throw new Meteor.Error("email-error", msg);
     }
 
+    if (order.refunded) {
+      const deliveredOption = {
+        to: order.email,
+        from: "THEODEN-RC <no-reply@theoden-rc-staging.herokuapp.com",
+        subject: "Canceled Order",
+        html: `<div style="margin: 0 auto; padding: 0 auto;">
+        <h1 style="font-family: 'PT Serif', serif;color:#000">THEODEN-RC</h1>
+        <hr style="background-color:#9f3c7c; height:3px;"/>
+        <h2 style="color:#803322;
+        font-family: 'Playfair Display', serif;">Order Cancelled</h2>
+        <p>Hi ${order.shipping[0].address.fullName},</p>
+        <p>Thanks for Shopping at THEODEN-RC.</p>
+        <p>Your order <b>(${order.items[0].productId})</b> has been Successfully Canceled and Refunded.</p>
+        <p>The THEODEN Team</p>
+        <p>235 Ikorodu Road, Ilupeju Lagos</p>
+        </div>`
+      };
+      const sender = "THEODEN-RC";
+      const recipient = `234${order.billing[0].address.phone.slice(1)}`;
+      const message = `Hi ${order.billing[0].address.fullName}. Your order (${order.items[0].productId}) has been confirmed cancelled Your wallet refunded`;
+
+      Reaction.Email.send(deliveredOption);
+      nexmo.message.sendSms(sender, recipient, message);
+      return true;
+    }
     // email templates can be customized in Templates collection
     // loads defaults from /private/email/templates
     const tpl = `orders/${order.workflow.status}`;
@@ -507,11 +569,38 @@ Meteor.methods({
 
     Reaction.Email.send({
       to: order.email,
-      from: `${shop.name} <${shop.emails[0].address}>`,
-      subject: `Your order is confirmed`,
+      from: "THEODEN-RC",
+      subject: "Your order is confirmed",
       // subject: `Order update from ${shop.name}`,
       html: SSR.render(tpl, dataForOrderEmail)
     });
+    const sender = "THEODEN-RC";
+    const recipient = `234${order.billing[0].address.phone.slice(1)}`;
+    const message = `Hi ${order.billing[0].address.fullName}. Your order (${order.items[0].productId}) has been confirmed and is being processed`;
+
+    nexmo.message.sendSms(sender, recipient, message);
+
+    if (order.shipping[0].tracking) {
+      const deliveredOption = {
+        to: order.email,
+        from: "THEODEN-RC",
+        subject: "Delivered Order",
+        html: `<div style="margin: 0 auto; padding: 0 auto;">
+        <h1 style="font-family: 'PT Serif', serif;color:#000">THEODEN-RC</h1>
+        <hr style="background-color:#2979FF; height:3px;"/>
+        <h2 style="color:#2979FF;
+        font-family: 'Playfair Display', serif;">Order Status</h2>
+        <p>Hi ${order.shipping[0].address.fullName},</p>
+        <p>Thanks for Shopping on THEODEN-RC. We provide for your every need.</p>
+        <p>Your order <b>(${order.items[0].productId})</b> has been delivered.</p>
+        <p>The THEODEN Team</p>
+        <p>235 Ikorodu Road, Ilupeju Lagos</p>
+        </div>`
+      };
+
+      Reaction.Email.send(deliveredOption);
+      nexmo.message.sendSms(sender, recipient, message);
+    }
 
     return true;
   },
@@ -592,7 +681,7 @@ Meteor.methods({
       "_id": order._id,
       "shipping._id": shipment._id
     }, {
-        $set: {
+      $set: {
           ["shipping.$.tracking"]: tracking
         }
       });
