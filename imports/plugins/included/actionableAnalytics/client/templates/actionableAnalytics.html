@@ -1,0 +1,223 @@
+<template name="analytics">
+  <div class="">
+    <ul class="nav nav-tabs nav-justified">
+      <li class="active"><a data-toggle="tab" href="#tab1">Summary</a></li>
+      <li><a data-toggle="tab" href="#tab2">Sales</a></li>
+      <li><a data-toggle="tab" href="#tab3">Orders</a></li>
+      <li><a data-toggle="tab" href="#tab4">Top Selling</a></li>
+      <li><a data-toggle="tab" href="#tab5">Top Earning</a></li>
+      <li><a data-toggle="tab" href="#tab6">Statements</a></li>
+    </ul>
+  </div>
+
+  <div class="tab-content">
+    <h3 class="container">{{tabTitle}}
+      <span class="pull-right"><small><small>
+        <label labelFor="fromdatepicker" class="fromdatepicker">From: </label> <input type="text" id="fromdatepicker">
+        <label labelFor="todatepicker" class="todatepicker">To: </label> <input type="text" id="todatepicker">
+      </small></small></span>
+    </h3>
+
+    <div id="tab1" class="tab-pane fade in active">
+      {{> analysisOverview ordersCancelled=ordersCancelled ordersPlaced=ordersPlaced totalSales=totalSales totalItemsPurchased=totalItemsPurchased totalShippingCost=totalShippingCost salesPerDay=salesPerDay}}
+    </div>
+
+    <div id="tab2" class="tab-pane fade">
+      {{> analysisSales allOrders=allOrders dateRange=dateRange}}
+    </div>
+
+    <div id="tab3" class="tab-pane fade">
+      {{> analysisOrders orders=orders}}
+    </div>
+
+    <div id="tab4" class="tab-pane fade">
+        {{> analysisTopSelling bestSelling=bestSelling}}
+      </div>
+
+    <div id="tab5" class="tab-pane fade">
+      {{> analysisTopEarning topEarning=topEarning}}
+    </div>
+
+    <div id="tab6" class="tab-pane fade">
+      {{> analysisStatements statements=statements}}
+    </div>
+  </div>
+</template>
+
+<template name="analysisOverview">
+  <!-- <h3>Overview</h3> -->
+  <div class="card container">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">
+        <h4>Total Sales: <strong>{{totalSales}}</strong></h4>
+      </li>
+      <li class="list-group-item">
+        <h4>Average Daily Sales: <strong>{{salesPerDay}}</strong></h4>
+      </li>
+      <li class="list-group-item">
+        <h4>Total Orders Placed: <strong>{{ordersPlaced}}</strong></h4>
+      </li>
+      <li class="list-group-item">
+        <h4>Total Orders Cancelled: <strong>{{ordersCancelled}}</strong></h4>
+      </li>
+      <li class="list-group-item">
+        <h4>Total Items Sold: <strong>{{totalItemsPurchased}}</strong></h4>
+      </li>
+      <li class="list-group-item">
+        <h4>Total Shipping Charges: <strong>{{totalShippingCost}}</strong></h4>
+      </li>
+    </ul>
+  </div>
+</template>
+
+<template name="analysisSales">
+  <div class="card container">
+    {{#if allOrders}}
+    <div class="">
+      {{> salesChart allOrders=allOrders dateRange=dateRange}}
+    </div>
+    {{ else }}
+    <table class="table table-striped table-hover table-responsive table-bordered">
+      <thead>
+        <tr>
+          <th class="text-center">No Data to display</th>
+        </tr>
+      </thead>
+    </table>
+    {{/if}}
+  </div>
+</template>
+
+<template name="salesChart">
+  <div>
+    {{> highchartsHelper chartId="test" chartWidth="100%" charHeight="100%" chartObject=topGenresChart}}
+  </div>
+</template>
+
+<template name="analysisOrders">
+  <div class="card container">
+    <table class="table table-striped table-hover table-responsive table-bordered">
+      {{#if orders}}
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Destination Country</th>
+          <th>Destination City</th>
+          <th>Tax</th>
+          <th>Shipping</th>
+          <th>Payment Processor</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each orders}}
+        <tr>
+          <td>{{date}}</td>
+          <td>{{country}}</td>
+          <td>{{city}}</td>
+          <td>{{taxes}}</td>
+          <td>{{shipping}}</td>
+          <td>{{paymentProcessor}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+      {{ else }}
+      <thead>
+        <tr>
+          <th class="text-center">No Data to display</th>
+        </tr>
+      </thead>
+      {{/if}}
+    </table>
+  </div>
+</template>
+
+<template name="analysisTopSelling">
+  <div class="card container">
+    <table class="table table-striped table-hover table-responsive table-bordered">
+      {{#if bestSelling}}
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity Sold</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each bestSelling}}
+        <tr>
+          <td>{{product}}</td>
+          <td>{{quantitySold}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+      {{ else }}
+      <thead>
+        <tr>
+          <th class="text-center">No Data to display</th>
+        </tr>
+      </thead>
+      {{/if}}
+    </table>
+  </div>
+</template>
+
+<template name="analysisTopEarning">
+  <div class="card container">
+    <table class="table table-striped table-hover table-responsive table-bordered">
+      {{#if topEarning}}
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Total Earning</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each topEarning}}
+        <tr>
+          <td>{{product}}</td>
+          <td>{{totalSales}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+      {{ else }}
+      <thead>
+        <tr>
+          <th class="text-center">No Data to display</th>
+        </tr>
+      </thead>
+      {{/if}}
+    </table>
+  </div>
+</template>
+
+<template name="analysisStatements">
+  <div class="card container">
+    <table class="table table-striped table-hover table-responsive table-bordered">
+      {{#if statements}}
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Product</th>
+          <th>Quantity Sold</th>
+          <th>Sales</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each statements}}
+        <tr>
+          <td>{{dateString}}</td>
+          <td>{{title}}</td>
+          <td>{{quantity}}</td>
+          <td>{{totalSales}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+      {{ else }}
+      <thead>
+        <tr>
+          <th class="text-center">No Data to display</th>
+        </tr>
+      </thead>
+      {{/if}}
+    </table>
+  </div>
+</template>
