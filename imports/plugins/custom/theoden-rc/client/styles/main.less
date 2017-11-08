@@ -34,6 +34,10 @@ background-image: linear-gradient(to right, rgba(0, 0, 0, 0.0001) 0%, #fafafa 10
 	display: block;
 }
 
+h1{
+  margin:auto;
+  font-size: 28px;
+  }
 
 /**
  * Message header
@@ -83,8 +87,9 @@ background-image: linear-gradient(to right, rgba(0, 0, 0, 0.0001) 0%, #fafafa 10
  */
 
 .bg-info{
-  background-color: #D9ACD3;
+  background-color: @background-purple;
   font-family: @font-family-patua-one;
+  color:white;
 }
 
 .table{
@@ -109,13 +114,15 @@ body{
  *  */
 .btn{
   font-family: @font-family-patua-one;
+
   &:hover{
     background-color: @background-light-purple;
   }
   }
 
-  .btn-success{
+  .btn-success, .wallet-btn{
     background-color: @background-purple;
+    color: white;
   }
 
 .btn[disabled]{
@@ -123,7 +130,7 @@ body{
     background-color: @background-light-purple;
   }
   }
-#btn-checkout, .btn-warning{
+#btn-checkout, .btn-warning, #btn-checkout-theoden{
   width: 60%;
   margin: auto;
   &:hover{
@@ -131,7 +138,9 @@ body{
   }
 }
 
-
+/*
+* Panel
+*/
 .checkout-steps .panel-default >
 .panel-heading, .checkout-steps .panel-default .panel-heading {
   background-color: @background-purple;
@@ -174,4 +183,38 @@ body{
   color:black;
   font-size: 28px;
   text-align:left;
+}
+
+
+/**
+ *Wallet
+ */
+
+.wallet-header{
+  color: white;
+}
+
+.wallet-padding{
+  padding-top: 10px;
+}
+
+.wallet-deposit{
+  padding-top: 20px;
+}
+
+.wallet-title{
+  font-family: @font-family-patua-one;
+}
+
+#btn-checkout{
+  width:100%;
+  background-color: @background-light-purple;
+ &:hover{
+    background-color: @background-purple;
+  }
+}
+
+.cart-alert{
+  background-color: @background-purple;
+
 }
