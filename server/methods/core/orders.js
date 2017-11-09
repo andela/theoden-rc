@@ -458,7 +458,7 @@ Meteor.methods({
         }
       }
     }
-
+    //
     // Merge data into single object to pass to email template
     const dataForOrderEmail = {
       homepage: Meteor.absoluteUrl(),
