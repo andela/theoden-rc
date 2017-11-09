@@ -90,6 +90,8 @@ function confirmTransfer(transaction, recipient) {
         (err, res) => {
           if (res === 2) {
             Alerts.toast(`No user with email ${recipient}`, "error");
+          } else if (res === 3) {
+            Alerts.toast("Insufficient balance", "error");
           } else if (res === 1) {
             document.getElementById("recipient").value = "";
             document.getElementById("transferAmount").value = "";

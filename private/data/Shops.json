@@ -3082,7 +3082,8 @@
     "tag",
     "index",
     "cart/checkout",
-    "cart/completed"
+    "cart/completed",
+    "help"
   ],
   "defaultRoles": [
     "account/profile",
@@ -3092,7 +3093,8 @@
     "index",
     "cart/checkout",
     "cart/completed",
-    "wallet"
+    "wallet",
+    "help"
   ]
 }, {
   "_id": "ddzuN2YPvgvx7rJS5",
