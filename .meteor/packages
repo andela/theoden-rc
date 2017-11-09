@@ -98,3 +98,6 @@ practicalmeteor:sinon
 pauldowman:dotenv
 nimble:restivus
 apinf:restivus-swagger
+richsilv:pikaday
+mrt:moment
+maazalik:highcharts

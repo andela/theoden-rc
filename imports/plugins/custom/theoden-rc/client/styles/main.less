@@ -11,7 +11,40 @@
 	background-color: @background-purple;
 }
 
+/*
+* Product details digital products
+*/
+.up-button {
+  background-color: @background-purple;
+  color: white;
+}
 
+.up-button:hover {
+  background-color: white;
+  color: @background-purple;
+}
+.digital {
+  margin-left: 7px;
+}
+.digital-check input:checked {
+  background-color: @background-purple;
+  color: white;
+}
+
+.digital-input {
+  overflow: hidden;
+  
+}
+ .digital-input input{
+  width: 100%;
+ }
+.downloadLink {
+  margin-top: 2%;
+}
+
+.progress-bar {
+ background-color: @background-purple;
+}
 
 .carousel-control-icon{
   display: inline-block;
@@ -19,6 +52,7 @@
   top: 50%;
   color: grey;
 }
+
 
 .carousel-control{
 background-image: linear-gradient(to right, rgba(0, 0, 0, 0.0001) 0%, #fafafa 100%) !important;
@@ -35,17 +69,20 @@ background-image: linear-gradient(to right, rgba(0, 0, 0, 0.0001) 0%, #fafafa 10
 	display: block;
 }
 
+h1{
+  margin:auto;
+  font-size: 28px;
+  }
 
 /**
  * Message header
  */
-
 .message-header{
-background-color: @background-purple;
-font-family: @font-family-patua-one;
-text-align: center;
-color: @white;
-padding:0.3em;
+  background-color: @background-purple;
+  font-family: @font-family-patua-one;
+  text-align: center;
+  color: @white;
+  padding:0.3em;
 
 }
 
@@ -122,5 +159,138 @@ padding:0.3em;
   color: @white;
   display: flex;
   align-items: center;
+}
+
+/**
+ * Wallet
+ */
+
+.bg-info{
+  background-color: @background-purple;
+  font-family: @font-family-patua-one;
+  color:white;
+}
+
+.table{
+  font-family: @font-family-josefin-sans;
+}
+
+body{
+  font-family: @font-family-patua-one;
+}
+
+#transaction-history{
+  font-family: @font-family-patua-one;
+  color: #000000;
+}
+
+/**
+ * Button
+ *  */
+.btn{
+  font-family: @font-family-patua-one;
+
+  &:hover{
+    background-color: @background-light-purple;
+  }
+  }
+
+  .btn-success, .wallet-btn{
+    background-color: @background-purple;
+    color: white;
+  }
+
+.btn[disabled]{
+  &:hover{
+    background-color: @background-light-purple;
+  }
+  }
+#btn-checkout, .btn-warning, #btn-checkout-theoden{
+  width: 60%;
+  margin: auto;
+  &:hover{
+    background-color: @background-light-purple;
+  }
+}
+
+/*
+* Panel
+*/
+.checkout-steps .panel-default >
+.panel-heading, .checkout-steps .panel-default .panel-heading {
+  background-color: @background-purple;
+  font-family: @font-family-patua-one;
+  color: white;
+
+}
+
+.panel-body{
+  font-family: @font-family-josefin-sans
+}
+
+.panel-default > .panel-heading{
+  background-color: @background-purple;
+  font-family: @font-family-patua-one;
+  color: white;
+}
+.panel-footer{
+  background-color: #e8e3e3;
+}
+
+.pdp.add-to-cart button{
+  background-color: @background-purple;
+  &:hover{
+    background-color: @background-light-purple;
+  }
+}
+
+.pdp.add-to-cart input{
+  background-color: @background-purple;
+
+}
+
+.pdp.header h1, .pdp.header .title-edit-input{
+  font-size: 45px;
+  text-align:left;
+}
+
+.pdp.header h2, .pdp.header .pageTitle-edit-input{
+  color:black;
+  font-size: 28px;
+  text-align:left;
+}
+
+
+/**
+ *Wallet
+ */
+
+.wallet-header{
+  color: white;
+}
+
+.wallet-padding{
+  padding-top: 10px;
+}
+
+.wallet-deposit{
+  padding-top: 20px;
+}
+
+.wallet-title{
+  font-family: @font-family-patua-one;
+}
+
+#btn-checkout{
+  width:100%;
+  background-color: @background-light-purple;
+ &:hover{
+    background-color: @background-purple;
+  }
+}
+
+.cart-alert{
+  background-color: @background-purple;
+
 }
 
