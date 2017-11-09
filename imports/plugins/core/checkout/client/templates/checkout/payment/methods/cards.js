@@ -81,6 +81,11 @@ Template.walletPayment.events({
       transactionType: "Debit"
     }, (err, res) => {
       if (res) {
+        if (res === 3) {
+          Alerts.toast("Insufficient balance", "error");
+          return false;
+        }
+
         const paymentMethod = {
           processor: "Wallet",
           storedCard: "",
