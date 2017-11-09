@@ -73,13 +73,52 @@ h1{
   position: fixed;
 }
 
-.table{
-  font-family: @font-family-josefin-sans;
-}
 
-body{
+#help-tips h3 {
   font-family: @font-family-patua-one;
 }
+
+#help-tips .panel-heading {
+  background-color: @background-purple;
+  &:hover{
+    background-color: #d9acd3;
+  }
+}
+
+#help-tips a > h4 {
+  font-family: @font-family-patua-one;
+  color: @white;
+}
+
+.helplink {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  -webkit-flex: 0 0 auto;
+  -moz-flex: 0 0 auto;
+  -ms-flex: 0 0 auto;
+  flex: 0 0 auto;
+  height: 55px;
+  padding: 0px 14px;
+  cursor: pointer;    
+  &:hover {
+    background-color: #666666;
+  }
+}
+
+.helplink a {
+  color: @white;
+  display: flex;
+  align-items: center;
+}
+
+
 
 
 

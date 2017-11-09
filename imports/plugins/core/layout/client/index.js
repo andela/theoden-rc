@@ -24,3 +24,6 @@ import "./templates/theme/theme.js";
 // Wallet templates
 import "./templates/layout/wallet/wallet.html";
 import "./templates/layout/wallet/wallet.js";
+
+// Info templates
+import "./templates/layout/help/help.html";

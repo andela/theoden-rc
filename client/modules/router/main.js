@@ -182,6 +182,12 @@ Router.initPackageRoutes = () => {
       }
     });
 
+    shop.route("/help", {
+      name: "help", action() {
+        ReactionLayout({ template: "help" });
+      }
+    });
+
     shop.route("/wallet", {
       name: "wallet", action() {
         ReactionLayout({ template: "wallet" });

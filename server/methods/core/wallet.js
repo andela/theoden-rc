@@ -12,9 +12,13 @@ Meteor.methods({
       balanceOptions = { balance: amount };
     }
     if (transactionType === "Debit") {
+      const sender = Accounts.findOne(userId);
+      wallet = Wallets.findOne({ userId });
+      if (!wallet || (wallet && (wallet.balance < amount))) {
+        return 3;
+      }
       if (transactions.to) {
         const recipient = Accounts.findOne({ "emails.0.address": transactions.to });
-        const sender = Accounts.findOne(userId);
         if (!recipient) {
           return 2;
         }
