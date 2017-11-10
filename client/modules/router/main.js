@@ -267,8 +267,17 @@ Router.initPackageRoutes = () => {
     }
   }
 };
-
-
+/**
+ * @param {String} path
+ */
+Router.route("/pages/:slug", {
+  action(params) {
+    ReactionLayout({
+      template: "staticPageDisplay",
+      slug: params.slug
+    });
+  }
+});
 /**
  * pathFor
  * @summary get current router path

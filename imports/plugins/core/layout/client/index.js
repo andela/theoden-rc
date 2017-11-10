@@ -7,6 +7,7 @@ import "./templates/layout/alerts/reactionAlerts.js";
 import "./templates/layout/createContentMenu/createContentMenu.html";
 import "./templates/layout/createContentMenu/createContentMenu.js";
 import "./templates/layout/footer/footer.html";
+import "./templates/layout/footer/footer.js";
 import "./templates/layout/header/brand.html";
 import "./templates/layout/header/button.html";
 import "./templates/layout/header/header.html";
