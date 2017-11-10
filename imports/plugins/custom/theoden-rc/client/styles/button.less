@@ -3,28 +3,82 @@
  *  */
 .btn{
   font-family: @font-family-patua-one;
-
+  border-color: @background-purple;
   &:hover{
     background-color: @background-light-purple;
-  }
-  }
-
-  .btn-success, .wallet-btn{
-    background-color: @background-purple;
-    color: white;
     border-color: @background-purple;
   }
 
+  }
+
+  .btn-success, .wallet-btn,.btn-success.active.focus {
+    background-color: @background-purple;
+    color: white;
+    border-color: @background-purple;
+    &:hover{
+      background-color: @background-light-purple;
+      border-color: @background-purple;
+    }
+    &:focus{
+      background-color: @background-light-purple;
+    }
+    &:active.focus{
+      background-color: @background-light-purple;
+    }
+    &:visited{
+      background-color: @background-light-purple;
+    }
+  }
+.btn-info{
+    background-color: @background-light-purple;
+
+&:focus{
+  background-color: @background-light-purple;
+}
+&:hover{
+background-color: @background-purple;
+}
+}
 .btn[disabled]{
+  border-color: @background-purple;
   &:hover{
     background-color: @background-light-purple;
   }
   }
-#btn-checkout, .btn-warning, #btn-checkout-theoden{
+#btn-checkout,.checkout-btn, .btn-warning, #btn-checkout-theoden{
   width: 60%;
   margin: auto;
+  border-color: @background-purple;
   &:hover{
+    background-color: @background-light-purple;
+    border-color: @background-purple;
+  }
+  &:focus{
+    background-color: @background-light-purple;
+  }
+  &:active{
+    background-color: @background-light-purple;
+  }
+  &:visited{
     background-color: @background-light-purple;
   }
 }
 
+.btn-toolbar > .btn-group{
+  border-color: @background-purple;
+
+  &:hover{
+    background-color: @background-light-purple;
+    border-color: @background-purple;
+  }
+&:focus{
+  background-color: @background-light-purple;
+}
+&:active{
+  background-color: @background-light-purple;
+}
+&:visited{
+  background-color: @background-light-purple;
+}
+
+}
