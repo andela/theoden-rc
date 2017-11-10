@@ -1,6 +1,6 @@
 <template name="analytics">
   <div class="">
-    <ul class="nav nav-tabs nav-justified">
+    <ul class="nav nav-tabs nav-justified analytics-tab">
       <li class="active"><a data-toggle="tab" href="#tab1">Summary</a></li>
       <li><a data-toggle="tab" href="#tab2">Sales</a></li>
       <li><a data-toggle="tab" href="#tab3">Orders</a></li>
@@ -12,10 +12,10 @@
 
   <div class="tab-content">
     <h3 class="container">{{tabTitle}}
-      <span class="pull-right"><small><small>
+      <div class="pull-right datepicker">
         <label labelFor="fromdatepicker" class="fromdatepicker">From: </label> <input type="text" id="fromdatepicker">
         <label labelFor="todatepicker" class="todatepicker">To: </label> <input type="text" id="todatepicker">
-      </small></small></span>
+      </div>
     </h3>
 
     <div id="tab1" class="tab-pane fade in active">

@@ -309,6 +309,14 @@ Template.orderStatusDetail.helpers({
 
   shipmentStatus() {
     const self = this;
+    if (this.workflow.status === "canceled" ||
+      this.workflow.status === "refunded") {
+      return {
+        shipped: false,
+        status: "danger",
+        label: i18next.t("order.filter.canceled")
+      };
+    }
     const shipment = this.shipping[0];
     const shipped = _.every(shipment.items, (shipmentItem) => {
       for (const fullItem of self.items) {
