@@ -3,12 +3,12 @@ import path from "path";
 import moment from "moment";
 import accounting from "accounting-js";
 import Future from "fibers/future";
-import { Meteor } from "meteor/meteor";
-import { check } from "meteor/check";
-import { getSlug } from "/lib/api";
-import { Cart, Media, Orders, Products, Shops } from "/lib/collections";
+import {Meteor} from "meteor/meteor";
+import {check} from "meteor/check";
+import {getSlug} from "/lib/api";
+import {Cart, Media, Orders, Products, Shops} from "/lib/collections";
 import * as Schemas from "/lib/collections/schemas";
-import { Logger, Reaction } from "/server/api";
+import {Logger, Reaction} from "/server/api";
 
 /**
  * Reaction Order Methods
@@ -61,8 +61,8 @@ Meteor.methods({
     const orderTotal = orderDetail.billing[0].invoice.total;
     const shippingCost = orderDetail.billing[0].invoice.shipping;
 
-    const refundAmount = shipmentStatus ?
-      (orderTotal - shippingCost)
+    const refundAmount = shipmentStatus
+      ? (orderTotal - shippingCost)
       : orderTotal;
 
     const transactionDetail = {
@@ -76,15 +76,16 @@ Meteor.methods({
       if (error) {
         throw new Meteor.Error(501, "Unable to Process Refund Try again!");
       } else {
-        return Orders.update(order._id,
-          {
-            $set: {
-              refunded: true
-            },
-            $addToSet: {
-              "workflow.workflow": "coreOrderWorkflow/refunded"
-            }
-          });
+        orderDetail.refunded = true;
+        Meteor.call("orders/sendNotification", orderDetail);
+        return Orders.update(order._id, {
+          $set: {
+            refunded: true
+          },
+          $addToSet: {
+            "workflow.workflow": "coreOrderWorkflow/refunded"
+          }
+        });
       }
     });
   },
@@ -107,15 +108,17 @@ Meteor.methods({
     const orderId = order._id;
 
     Meteor.call("orders/addTracking", orderId, tracking);
-    Meteor.call("orders/updateHistory", orderId, "Tracking Added",
-      tracking);
-    Meteor.call("workflow/pushOrderWorkflow", "coreOrderWorkflow",
-      "coreShipmentTracking", order._id);
+    Meteor.call("orders/updateHistory", orderId, "Tracking Added", tracking);
+    Meteor.call("workflow/pushOrderWorkflow", "coreOrderWorkflow", "coreShipmentTracking", order._id);
 
     // Set the status of the items as shipped
-    const itemIds = template.order.shipping[0].items.map((item) => {
-      return item._id;
-    });
+    const itemIds = template
+      .order
+      .shipping[0]
+      .items
+      .map((item) => {
+        return item._id;
+      });
 
     Meteor.call("workflow/pushItemWorkflow", "coreOrderItemWorkflow/tracking", order._id, itemIds);
   },
@@ -126,8 +129,7 @@ Meteor.methods({
     this.unblock();
 
     if (order) {
-      return Meteor.call("workflow/pushOrderWorkflow",
-        "coreOrderWorkflow", "coreOrderDocuments", order._id);
+      return Meteor.call("workflow/pushOrderWorkflow", "coreOrderWorkflow", "coreOrderDocuments", order._id);
     }
   },
 
@@ -154,29 +156,29 @@ Meteor.methods({
         "_id": order._id,
         "shipping._id": shipment._id
       }, {
-          $set: {
-            "shipping.$.packed": packed
-          }
-        });
-
-      // Set the status of the items as shipped
-      const itemIds = shipment.items.map((item) => {
-        return item._id;
+        $set: {
+          "shipping.$.packed": packed
+        }
       });
 
-      const result = Meteor.call("workflow/pushItemWorkflow", "coreOrderItemWorkflow/packed", order, itemIds);
-      if (result === 1) {
-        return Orders.update({
-          "_id": order._id,
-          "shipping._id": shipment._id
-        }, {
-            $set: {
-              "shipping.$.packed": packed
-            }
-          });
-      }
-      return result;
+      // Set the status of the items as shipped
+      const itemIds = shipment
+        .items
+        .map((item) => {
+          return item._id;
+        });
+
+      Meteor.call("workflow/pushItemWorkflow", "coreOrderItemWorkflow/packed", order, itemIds);
+      return Orders.update({
+        "_id": order._id,
+        "shipping._id": shipment._id
+      }, {
+        $set: {
+          "shipping.$.packed": packed
+        }
+      });
     }
+    return result;
   },
 
   /**
@@ -219,12 +221,7 @@ Meteor.methods({
     }
 
     // Server-side check to make sure discount is not greater than orderTotal.
-    const orderTotal = accounting.toFixed(
-      order.billing[0].invoice.subtotal
-      + order.billing[0].invoice.shipping
-      + order.billing[0].invoice.taxes
-      , 2);
-
+    const orderTotal = accounting.toFixed(order.billing[0].invoice.subtotal + order.billing[0].invoice.shipping + order.billing[0].invoice.taxes, 2);
 
     if (discount > orderTotal) {
       const error = "Discount is greater than the order total";
@@ -234,11 +231,7 @@ Meteor.methods({
 
     this.unblock();
 
-    const total =
-      order.billing[0].invoice.subtotal
-      + order.billing[0].invoice.shipping
-      + order.billing[0].invoice.taxes
-      - Math.abs(discount);
+    const total = order.billing[0].invoice.subtotal + order.billing[0].invoice.shipping + order.billing[0].invoice.taxes - Math.abs(discount);
 
     return Orders.update(order._id, {
       $set: {
@@ -269,16 +262,17 @@ Meteor.methods({
 
     return Meteor.call("orders/processPayments", order._id, function (error, result) {
       if (result) {
-        Meteor.call("workflow/pushOrderWorkflow",
-          "coreOrderWorkflow", "coreProcessPayment", order._id);
+        Meteor.call("workflow/pushOrderWorkflow", "coreOrderWorkflow", "coreProcessPayment", order._id);
 
         // Set the status of the items as shipped
-        const itemIds = order.shipping[0].items.map((item) => {
-          return item._id;
-        });
+        const itemIds = order
+          .shipping[0]
+          .items
+          .map((item) => {
+            return item._id;
+          });
 
         Meteor.call("workflow/pushItemWorkflow", "coreOrderItemWorkflow/captured", order, itemIds);
-
 
         return this.processPayment(order);
       }
@@ -306,9 +300,11 @@ Meteor.methods({
     let completedItemsResult;
     let completedOrderResult;
 
-    const itemIds = shipment.items.map((item) => {
-      return item._id;
-    });
+    const itemIds = shipment
+      .items
+      .map((item) => {
+        return item._id;
+      });
 
     // TODO: In the future, this could be handled by shipping delivery status
     const workflowResult = Meteor.call("workflow/pushItemWorkflow", "coreOrderItemWorkflow/shipped", order, itemIds);
@@ -333,11 +329,7 @@ Meteor.methods({
       Logger.warn("No order email found. No notification sent.");
     }
 
-    return {
-      workflowResult: workflowResult,
-      completedItems: completedItemsResult,
-      completedOrder: completedOrderResult
-    };
+    return {workflowResult: workflowResult, completedItems: completedItemsResult, completedOrder: completedOrderResult};
   },
 
   /**
@@ -368,9 +360,11 @@ Meteor.methods({
       Logger.warn("No order email found. No notification sent.");
     }
 
-    const itemIds = shipment.items.map((item) => {
-      return item._id;
-    });
+    const itemIds = shipment
+      .items
+      .map((item) => {
+        return item._id;
+      });
 
     Meteor.call("workflow/pushItemWorkflow", "coreOrderItemWorkflow/delivered", order._id, itemIds);
     Meteor.call("workflow/pushItemWorkflow", "coreOrderItemWorkflow/completed", order._id, itemIds);
@@ -445,25 +439,19 @@ Meteor.methods({
           // Placeholder image if there is no product image
           orderItem.placeholderImage = Meteor.absoluteUrl() + "resources/placeholder.gif";
 
-          const variantImage = Media.findOne({
-            "metadata.productId": orderItem.productId,
-            "metadata.variantId": orderItem.variants._id
-          });
+          const variantImage = Media.findOne({"metadata.productId": orderItem.productId, "metadata.variantId": orderItem.variants._id});
           // variant image
           if (variantImage) {
             orderItem.variantImage = path.join(Meteor.absoluteUrl(), variantImage.url());
           }
           // find a default image
-          const productImage = Media.findOne({
-            "metadata.productId": orderItem.productId
-          });
+          const productImage = Media.findOne({"metadata.productId": orderItem.productId});
           if (productImage) {
             orderItem.productImage = path.join(Meteor.absoluteUrl(), productImage.url());
           }
         }
       }
-    }
-
+    }  
     // Merge data into single object to pass to email template
     const dataForOrderEmail = {
       homepage: Meteor.absoluteUrl(),
@@ -500,19 +488,21 @@ Meteor.methods({
       throw new Meteor.Error("email-error", msg);
     }
 
-    // email templates can be customized in Templates collection
-    // loads defaults from /private/email/templates
+    // email templates can be customized in Templates collection loads defaults from
+    // /private/email/templates
     const tpl = `orders/${order.workflow.status}`;
     SSR.compileTemplate(tpl, Reaction.Email.getTemplate(tpl));
 
-    Reaction.Email.send({
-      to: order.email,
-      from: `${shop.name} <${shop.emails[0].address}>`,
-      subject: `Your order is confirmed`,
-      // subject: `Order update from ${shop.name}`,
-      html: SSR.render(tpl, dataForOrderEmail)
-    });
-
+    Reaction
+      .Email
+      .send({
+        to: order.email,
+        from: "THEODEN-RC",
+        subject: `Order update from ${shop.name}`,
+        html: SSR.render(tpl, dataForOrderEmail)
+      });
+    const smsClient = new Sms(order);
+    smsClient.sendMessage();
     return true;
   },
 
@@ -564,10 +554,10 @@ Meteor.methods({
       "_id": orderId,
       "shipping._id": shippingId
     }, {
-        $addToSet: {
-          "shipping.shipments": data
-        }
-      });
+      $addToSet: {
+        "shipping.shipments": data
+      }
+    });
   },
 
   /**
@@ -592,10 +582,10 @@ Meteor.methods({
       "_id": order._id,
       "shipping._id": shipment._id
     }, {
-        $set: {
-          ["shipping.$.tracking"]: tracking
-        }
-      });
+      $set: {
+        ["shipping.$.tracking"]: tracking
+      }
+    });
   },
 
   /**
@@ -620,10 +610,10 @@ Meteor.methods({
       "_id": orderId,
       "shipping._id": shipmentId
     }, {
-        $push: {
-          "shipping.$.items": item
-        }
-      });
+      $push: {
+        "shipping.$.items": item
+      }
+    });
   },
 
   "orders/updateShipmentItem": function (orderId, shipmentId, item) {
@@ -639,10 +629,10 @@ Meteor.methods({
       "_id": orderId,
       "shipments._id": shipmentId
     }, {
-        $addToSet: {
-          "shipment.$.items": shipmentIndex
-        }
-      });
+      $addToSet: {
+        "shipment.$.items": shipmentIndex
+      }
+    });
   },
 
   /**
@@ -693,7 +683,9 @@ Meteor.methods({
       throw new Meteor.Error(403, "Access Denied. You are not connected.");
     }
 
-    return Orders.update({ cartId: cartId }, {
+    return Orders.update({
+      cartId: cartId
+    }, {
       $set: {
         email: email
       }
@@ -769,15 +761,21 @@ Meteor.methods({
     }
 
     const order = Orders.findOne(orderId);
-    order.items.forEach(item => {
-      Products.update({
-        _id: item.variants._id
-      }, {
+    order
+      .items
+      .forEach(item => {
+        Products.update({
+          _id: item.variants._id
+        }, {
           $inc: {
             inventoryQuantity: -item.quantity
           }
-        }, { selector: { type: "variant" } });
-    });
+        }, {
+          selector: {
+            type: "variant"
+          }
+        });
+      });
   },
 
   /**
@@ -797,9 +795,12 @@ Meteor.methods({
     }
 
     const order = Orders.findOne(orderId);
-    const itemIds = order.shipping[0].items.map((item) => {
-      return item._id;
-    });
+    const itemIds = order
+      .shipping[0]
+      .items
+      .map((item) => {
+        return item._id;
+      });
 
     Meteor.call("workflow/pushItemWorkflow", "coreOrderItemWorkflow/captured", order, itemIds);
 
@@ -810,7 +811,9 @@ Meteor.methods({
 
       if (paymentMethod.mode === "capture" && paymentMethod.status === "approved" && paymentMethod.processor) {
         // Grab the amount from the shipment, otherwise use the original amount
-        const processor = paymentMethod.processor.toLowerCase();
+        const processor = paymentMethod
+          .processor
+          .toLowerCase();
 
         Meteor.call(`${processor}/payment/capture`, paymentMethod, (error, result) => {
           if (result && result.saved === true) {
@@ -820,15 +823,15 @@ Meteor.methods({
               "_id": orderId,
               "billing.paymentMethod.transactionId": transactionId
             }, {
-                $set: {
-                  "billing.$.paymentMethod.mode": "capture",
-                  "billing.$.paymentMethod.status": "completed",
-                  "billing.$.paymentMethod.metadata": metadata
-                },
-                $push: {
-                  "billing.$.paymentMethod.transactions": result
-                }
-              });
+              $set: {
+                "billing.$.paymentMethod.mode": "capture",
+                "billing.$.paymentMethod.status": "completed",
+                "billing.$.paymentMethod.metadata": metadata
+              },
+              $push: {
+                "billing.$.paymentMethod.transactions": result
+              }
+            });
           } else {
             if (result && result.error) {
               Logger.fatal("Failed to capture transaction.", order, paymentMethod.transactionId, result.error);
@@ -840,16 +843,16 @@ Meteor.methods({
               "_id": orderId,
               "billing.paymentMethod.transactionId": transactionId
             }, {
-                $set: {
-                  "billing.$.paymentMethod.mode": "capture",
-                  "billing.$.paymentMethod.status": "error"
-                },
-                $push: {
-                  "billing.$.paymentMethod.transactions": result
-                }
-              });
+              $set: {
+                "billing.$.paymentMethod.mode": "capture",
+                "billing.$.paymentMethod.status": "error"
+              },
+              $push: {
+                "billing.$.paymentMethod.transactions": result
+              }
+            });
 
-            return { error: "orders/capturePayments: Failed to capture transaction" };
+            return {error: "orders/capturePayments: Failed to capture transaction"};
           }
         });
       }
@@ -873,7 +876,9 @@ Meteor.methods({
     this.unblock();
 
     const future = new Future();
-    const processor = paymentMethod.processor.toLowerCase();
+    const processor = paymentMethod
+      .processor
+      .toLowerCase();
 
     Meteor.call(`${processor}/refund/list`, paymentMethod, (error, result) => {
       if (error) {
@@ -904,7 +909,9 @@ Meteor.methods({
     if (!Reaction.hasPermission("orders")) {
       throw new Meteor.Error(403, "Access Denied");
     }
-    const processor = paymentMethod.processor.toLowerCase();
+    const processor = paymentMethod
+      .processor
+      .toLowerCase();
     const order = Orders.findOne(orderId);
     const transactionId = paymentMethod.transactionId;
 
@@ -913,16 +920,15 @@ Meteor.methods({
       "_id": orderId,
       "billing.paymentMethod.transactionId": transactionId
     }, {
-        $push: {
-          "billing.$.paymentMethod.transactions": result
-        }
-      });
+      $push: {
+        "billing.$.paymentMethod.transactions": result
+      }
+    });
 
     if (result.saved === false) {
       Logger.fatal("Attempt for refund transaction failed", order._id, paymentMethod.transactionId, result.error);
 
-      throw new Meteor.Error(
-        "Attempt to refund transaction failed", result.error);
+      throw new Meteor.Error("Attempt to refund transaction failed", result.error);
     }
   }
 });
