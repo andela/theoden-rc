@@ -1,8 +1,6 @@
 import _ from "lodash";
 import path from "path";
 import moment from "moment";
-import Nexmo from 'nexmo';
-import dotenv from 'dotenv';
 import accounting from "accounting-js";
 import Future from "fibers/future";
 import {Meteor} from "meteor/meteor";
@@ -11,10 +9,6 @@ import {getSlug} from "/lib/api";
 import {Cart, Media, Orders, Products, Shops} from "/lib/collections";
 import * as Schemas from "/lib/collections/schemas";
 import {Logger, Reaction} from "/server/api";
-dotenv.config();
-
-// create a nexmo instance with api keys
-const nexmo = new Nexmo({apiKey: process.env.NEXMO_API_KEY, apiSecret: process.env.NEXMO_API_SECRET});
 
 /**
  * Reaction Order Methods
@@ -457,8 +451,7 @@ Meteor.methods({
           }
         }
       }
-    }
-    
+    }  
     // Merge data into single object to pass to email template
     const dataForOrderEmail = {
       homepage: Meteor.absoluteUrl(),
@@ -508,21 +501,8 @@ Meteor.methods({
         subject: `Order update from ${shop.name}`,
         html: SSR.render(tpl, dataForOrderEmail)
       });
-    const sender = "THEODEN-RC";
-    const recipient = `234${order
-      .billing[0]
-      .address
-      .phone
-      .slice(1)}`;
-    const message = `Hi ${order.billing[0].address.fullName}. 
-    Your order (${order.items[0].productId}) 
-    has been Successfully
-    ${ (order.workflow.status === "refunded" || order.workflow.status === "canceled")
-      ? "Canceled and Wallet Refunded"
-      : "confirmed and is being processed"}`;
-    nexmo
-      .message
-      .sendSms(sender, recipient, message);
+    const smsClient = new Sms(order);
+    smsClient.sendMessage();
     return true;
   },
 
