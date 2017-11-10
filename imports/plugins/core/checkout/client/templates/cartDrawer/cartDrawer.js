@@ -75,7 +75,7 @@ Template.openCartDrawer.helpers({
  *
  */
 Template.openCartDrawer.events({
-  "click #btn-checkout": function () {
+  "click #btn-checkout-theoden": function () {
     $("#cart-drawer-container").fadeOut();
     Session.set("displayCart", false);
     return Reaction.Router.go("cart/checkout");
