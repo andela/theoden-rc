@@ -30,6 +30,9 @@ Template.cartCompleted.helpers({
     if (this.workflow.status === "new") {
       return i18next.t("cartCompleted.submitted");
     }
+    if (this.workflow.status === "coreOrderWorkflow/completed") {
+      return i18next.t("order.completed");
+    }
     return this.workflow.status;
   },
   userOrders: function () {
