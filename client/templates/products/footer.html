@@ -1,14 +1,38 @@
 <template name="theodenfooter">
-    <div class="footer">
-<div class="paystackheader">
-      <h4 style="display:inline-block;"><span class="secured">secured by</span></h4>
-      <h3 style="display:inline-block;"><span class="paystack"> PayStack</span></h3>
-</div>
-      <div  class="payplat_images">
-        <img src="/resources/footer-images/paystack_m.png">
-        <img src="/resources/footer-images/visa-mastercard-logo_m.png">
-        <img src="/resources/footer-images/verve_logo_m.png">
+  <div class="footer">
+    <div class="row">
+      <div class="col-md-9 col-sm-12">
+        {{#if staticPagesCategory}} {{#each category in staticPagesCategory}}
+        <div class="col-md-4 col-sm-6 footer-links">
+          <div class="footer-header">
+            <strong>{{categoryHeader category}}</strong>
+          </div>
+          {{#each staticPage in category}}
+          <p>
+            <a href="/pages/{{staticPage.slug}}">
+              {{staticPage.pageTitle}}
+            </a>
+          </p>
+          {{/each}}
+        </div>
+        {{/each}} {{/if}}
+      </div>
+      <div class="col-md-3 col-sm-12">
+        <div class="paystackheader">
+          <h4 style="display:inline-block;">
+            <span class="secured">secured by</span>
+          </h4>
+          <h3 style="display:inline-block;">
+            <span class="paystack"> PayStack</span>
+          </h3>
+        </div>
+        <div class="payplat_images">
+          <img src="/resources/footer-images/paystack_m.png">
+          <img src="/resources/footer-images/visa-mastercard-logo_m.png">
+          <img src="/resources/footer-images/verve_logo_m.png">
+        </div>
       </div>
     </div>
+  </div>
 
 </template>

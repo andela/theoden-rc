@@ -1,0 +1,16 @@
+<template name="staticPageDisplay">
+  <div class="container">
+    <div class="row">
+      {{#each pageInfo in staticPage slug }}
+      <div>
+        <h2 class="center">
+          <strong>{{pageInfo.pageTitle}}</strong>
+        </h2>
+        <div class="static-content">
+          {{{pageInfo.content}}}
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</template>

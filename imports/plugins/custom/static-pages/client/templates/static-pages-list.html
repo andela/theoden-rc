@@ -1,0 +1,31 @@
+<Template name="staticPagesList">
+  <div class="row sidebar-title">
+    <h4 class="center">
+      Current Pages
+    </h4>
+  </div>
+  <div class="row page-list">
+    {{#if allStaticPages}} {{#each staticPage in allStaticPages}}
+    <div class="row">
+      <div class="fields">
+        <div class="col-md-8">
+          <h5>
+            {{staticPage.pageTitle}}
+          </h5>
+        </div>
+        <div class="col-md-4 icons-fa">
+          <button class="btn-primary float-left" data-id="{{staticPage._id}}" name="edit-page">
+            <i class="fa fa-pencil" data-id="{{staticPage._id}}">
+            </i>
+          </button>
+          <button class="btn-danger float-right" data-id="{{staticPage._id}}" name="delete-page">
+            <i class="fa fa-trash-o" data-id="{{staticPage._id}}">
+            </i>
+          </button>
+        </div>
+      </div>
+    </div>{{/each}} {{else}}
+    <h5>Empty</h5>
+    {{/if}}
+  </div>
+</Template>
