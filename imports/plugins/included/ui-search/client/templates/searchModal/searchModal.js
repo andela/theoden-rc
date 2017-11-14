@@ -3,7 +3,7 @@ import React from "react";
 import { DataType } from "react-taco-table";
 import { Template } from "meteor/templating";
 import { i18next } from "/client/api";
-import { ProductSearch, Tags, OrderSearch, AccountSearch } from "/lib/collections";
+import { ProductSearch, Tags, OrderSearch, AccountSearch, Products } from "/lib/collections";
 import { IconButton, SortableTable } from "/imports/plugins/core/ui/client/components";
 
 /*
@@ -27,10 +27,58 @@ Template.searchModal.onCreated(function () {
     canLoadMoreProducts: false,
     searchQuery: "",
     productSearchResults: [],
-    tagSearchResults: []
+    tagSearchResults: [],
+    allProducts: [],
+    isProductSearch: ""
   });
 
+  // Sort products by price
+  const sortSearch = (products, type) => {
+    switch (type) {
+      case "lowest":
+        return products.sort((product1, product2) => {
+          const firstProduct = product1.price === null ? -1 : product1.price.min;
+          const secondProduct = product2.price === null ? -1 : product2.price.min;
+          return firstProduct - secondProduct;
+        });
+      case "highest":
+        return products.sort((product1, product2) => {
+          const firstProduct = product1.price === null ? -1 : product1.price.min;
+          const secondProduct = product2.price === null ? -1 : product2.price.min;
+          return secondProduct - firstProduct;
+        });
+      case "newest":
+        return products.reverse();
+      case "oldest":
+        return products;
+      default:
+        break;
+    }
+  };
 
+  // Filter products by vendor
+  const filterByVendor = (products, query) => {
+    return _.filter(products, (product) => {
+      return product.vendor === query;
+    });
+  };
+
+  // filter search by price range
+  const filterByPrice = (products, price1, price2) => {
+    return _.filter(products, (product) => {
+      if (product.price) {
+        const maxPrice = parseFloat(product.price.max);
+        const minPrice = parseFloat(product.price.min);
+        const queryMaxPrice = parseFloat(price2);
+        const queryMinPrice = parseFloat(price1);
+        if ((minPrice >= queryMinPrice && minPrice <= queryMaxPrice)
+        || (maxPrice >= queryMinPrice && maxPrice <= queryMaxPrice)) {
+          return product;
+        }
+        return false;
+      }
+    });
+  };
   // Allow modal to be closed by clicking ESC
   // Must be done in Template.searchModal.onCreated and not in Template.searchModal.events
   $(document).on("keyup", (event) => {
@@ -49,16 +97,37 @@ Template.searchModal.onCreated(function () {
     const searchQuery = this.state.get("searchQuery");
     const facets = this.state.get("facets") || [];
     const sub = this.subscribe("SearchResults", searchCollection, searchQuery, facets);
+    const sortOptions = Session.get("sortValue");
+    const vendorFilter = Session.get("sortVendorValue");
+    const priceFilter1 = Session.get("sortPriceValue1");
+    const priceFilter2 = Session.get("sortPriceValue2");
+
 
     if (sub.ready()) {
       /*
        * Product Search
        */
       if (searchCollection === "products") {
-        const productResults = ProductSearch.find().fetch();
+        let productResults = ProductSearch.find().fetch();
+        if (!["null", "all"].includes(sortOptions) && sortOptions) {
+          productResults = sortSearch(productResults, sortOptions);
+        }
+
+        if (!["null", "all"].includes(vendorFilter) && vendorFilter) {
+          productResults = filterByVendor(productResults, vendorFilter);
+        }
+
+        if ((!["null", "all"].includes(priceFilter1) && priceFilter1) || (!["null", "all"].includes(priceFilter2) && priceFilter2)) {
+          productResults = filterByPrice(productResults, priceFilter1, priceFilter2);
+        }
+
+        const allProducts = Products.find().fetch();
+        this.state.set("allProducts", allProducts);
+
         const productResultsCount = productResults.length;
         this.state.set("productSearchResults", productResults);
         this.state.set("productSearchCount", productResultsCount);
+        this.state.set("isProductSearch", true);
 
         const hashtags = [];
         for (const product of productResults) {
@@ -88,7 +157,7 @@ Template.searchModal.onCreated(function () {
         const accountResultsCount = accountResults.length;
         this.state.set("accountSearchResults", accountResults);
         this.state.set("accountSearchCount", accountResultsCount);
-
+        this.state.set("isProductSearch", false);
         // TODO: Do we need this?
         this.state.set("orderSearchResults", "");
         this.state.set("productSearchResults", "");
@@ -103,6 +172,7 @@ Template.searchModal.onCreated(function () {
         const orderResultsCount = orderResults.length;
         this.state.set("orderSearchResults", orderResults);
         this.state.set("orderSearchCount", orderResultsCount);
+        this.state.set("isProductSearch", false);
 
 
         // TODO: Do we need this?
@@ -147,6 +217,21 @@ Template.searchModal.helpers({
   },
   showSearchResults() {
     return false;
+  },
+  allProducts() {
+    const instance = Template.instance();
+    const results = instance.state.get("allProducts");
+    return results;
+  },
+  searchQuery() {
+    const instance = Template.instance();
+    const results = instance.state.get("searchQuery");
+    return results;
+  },
+  isProductSearch() {
+    const instance = Template.instance();
+    const results = instance.state.get("isProductSearch");
+    return results;
   }
 });
 
@@ -196,7 +281,6 @@ Template.searchModal.events({
 
     $(".search-type-option").not(event.target).removeClass("search-type-active");
     $(event.target).addClass("search-type-active");
-
     $("#search-input").focus();
 
     templateInstance.state.set("searchCollection", searchCollection);

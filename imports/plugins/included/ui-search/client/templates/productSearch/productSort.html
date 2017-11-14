@@ -1,0 +1,39 @@
+<template name="productSortOptions">
+  <p class="title-filter">Filter search results</p>
+  <div class="row sort-select">
+      <div class="col-md-3">
+        <div>
+            <span><b>Vendor: </b></span>
+        </div>
+          <select id="vendor-filter" class="selectpicker fix">
+                <option value="all">All Vendors</option>
+                {{#each vendor in getVendors allProducts }}
+                  <option value="{{vendor}}">{{vendor}}</option>
+                {{/each}}
+          </select>
+        </div>
+    <div class="col-md-5 slider-fix">
+      <div>
+          <span><b>Price range: </b></span>
+      </div>
+      <div class="row price-fix">
+        <input class="col-xs-2" id="price-filter1" type="number" value="{{sliderMin}}"/>
+        <div class="col-xs-7 slider-fix" id="slider"></div>
+        <input class="col-xs-2" id="price-filter2" type="number" value="{{sliderMax}}"/>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div>
+          <span><b>Sort By: </b></span>
+      </div>
+      <select id="sort" class="selectpicker fix">
+          <option value="newest">Newest Items</option>
+          <option value="oldest">Oldest Items</option>
+          <option value="lowest">Lowest Price</option>
+          <option value="highest">Highest Price</option>      
+      </select>
+    </div>
+  </div>
+</template>
+
