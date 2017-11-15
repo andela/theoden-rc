@@ -9,3 +9,6 @@ import "./components/helplink/helplink.js";
 
 import "./components/navbar/navbar.html";
 import "./components/navbar/navbar.js";
+
+import "./components/tourButton/tourButton.html";
+import "./components/tourButton/tourButton";
